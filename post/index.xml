@@ -13,7 +13,8 @@
       <pubDate>Mon, 25 Oct 2021 00:00:00 +0000</pubDate>
       
       <guid>/2021/10/25/cleaning-up-bad-football-data/</guid>
-      <description>In class, we learned how to take bad text inside of a data file and correct it to clean it up. This is the process that I took to clean up the data that I was given.</description>
+      <description>In class, we learned how to take bad text inside of a data file and correct it to clean it up. This is the process that I took to clean up the data that I was given.
+library(tidyverse) ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ── ## ✓ ggplot2 3.3.5 ✓ purrr 0.3.4 ## ✓ tibble 3.1.3 ✓ dplyr 1.0.7 ## ✓ tidyr 1.1.3 ✓ stringr 1.4.0 ## ✓ readr 2.</description>
     </item>
     
   </channel>
