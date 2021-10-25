@@ -62,7 +62,7 @@
 
   <article class="article">
     
-    <span class="article-duration">1 min read</span>
+    <span class="article-duration">9 min read</span>
     
 
     <h1 class="article-title">Cleaning up bad football data</h1>
@@ -86,6 +86,185 @@
 <pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(ggalt)</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;ggalt&#39;:
+##   method                  from   
+##   grid.draw.absoluteGrob  ggplot2
+##   grobHeight.absoluteGrob ggplot2
+##   grobWidth.absoluteGrob  ggplot2
+##   grobX.absoluteGrob      ggplot2
+##   grobY.absoluteGrob      ggplot2</code></pre>
+<p>To start, you need to download your csv file and create a new field. I chose my field to be “badlogs” since this is the uncleaned version of my football logs.</p>
+<pre class="r"><code>badlogs &lt;- read_csv(&quot;badfootballlogs19.csv&quot;)</code></pre>
+<pre><code>## Rows: 1662 Columns: 51</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (8): Date, HomeAway, Opponent, Result, TeamFull, TeamURL, Team, Conference
+## dbl (43): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, R...</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>head(badlogs)</code></pre>
+<pre><code>## # A tibble: 6 × 51
+##    Game Date    HomeAway Opponent         Result    PassingCmp PassingAtt PassingPct
+##   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;            &lt;chr&gt;          &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+## 1     1 8/24/19 N        Miami (FL)       W (24-20)         17         27       63  
+## 2     2 9/7/19  &lt;NA&gt;     Tennessee-Martin W (45-0)          30         36       83.3
+## 3     3 9/14/19 @        Kentucky         W (29-21)         21         30       70  
+## 4     4 9/21/19 &lt;NA&gt;     Tennessee        W (34-3)          24         34       70.6
+## 5     5 9/28/19 &lt;NA&gt;     Towson           W (38-0)          24         28       85.7
+## 6     6 10/5/19 &lt;NA&gt;     Auburn           W (24-13)         25         39       64.1
+## # … with 43 more variables: PassingYds &lt;dbl&gt;, PassingTD &lt;dbl&gt;,
+## #   RushingAtt &lt;dbl&gt;, RushingYds &lt;dbl&gt;, RushingAvg &lt;dbl&gt;, RushingTD &lt;dbl&gt;,
+## #   OffensivePlays &lt;dbl&gt;, OffensiveYards &lt;dbl&gt;, OffenseAvg &lt;dbl&gt;,
+## #   FirstDownPass &lt;dbl&gt;, FirstDownRush &lt;dbl&gt;, FirstDownPen &lt;dbl&gt;,
+## #   FirstDownTotal &lt;dbl&gt;, Penalties &lt;dbl&gt;, PenaltyYds &lt;dbl&gt;, Fumbles &lt;dbl&gt;,
+## #   Interceptions &lt;dbl&gt;, TotalTurnovers &lt;dbl&gt;, TeamFull &lt;chr&gt;, TeamURL &lt;chr&gt;,
+## #   DefPassingCmp &lt;dbl&gt;, DefPassingAtt &lt;dbl&gt;, DefPassingPct &lt;dbl&gt;, …</code></pre>
+<p>Now, looking at this, it probably doesn’t look too bad, but we were asked to rearrange some things to make it better. We were asked to split the ‘Result’ column into two separate columns: ‘Outcome’ and ‘Score’. Inside of the ‘Outcome’ column, we needed to show if the team won or loss.</p>
+<pre class="r"><code>badlogs  %&gt;% 
+  separate(Result, into=c(&quot;Outcome&quot;, &quot;Score&quot;), sep=&quot; &quot;) %&gt;%
+  separate(Outcome, into=c(&quot;W/L&quot;)) %&gt;% head()</code></pre>
+<pre><code>## # A tibble: 6 × 52
+##    Game Date    HomeAway Opponent   `W/L` Score PassingCmp PassingAtt PassingPct
+##   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+## 1     1 8/24/19 N        Miami (FL) W     (24-…         17         27       63  
+## 2     2 9/7/19  &lt;NA&gt;     Tennessee… W     (45-…         30         36       83.3
+## 3     3 9/14/19 @        Kentucky   W     (29-…         21         30       70  
+## 4     4 9/21/19 &lt;NA&gt;     Tennessee  W     (34-…         24         34       70.6
+## 5     5 9/28/19 &lt;NA&gt;     Towson     W     (38-…         24         28       85.7
+## 6     6 10/5/19 &lt;NA&gt;     Auburn     W     (24-…         25         39       64.1
+## # … with 43 more variables: PassingYds &lt;dbl&gt;, PassingTD &lt;dbl&gt;,
+## #   RushingAtt &lt;dbl&gt;, RushingYds &lt;dbl&gt;, RushingAvg &lt;dbl&gt;, RushingTD &lt;dbl&gt;,
+## #   OffensivePlays &lt;dbl&gt;, OffensiveYards &lt;dbl&gt;, OffenseAvg &lt;dbl&gt;,
+## #   FirstDownPass &lt;dbl&gt;, FirstDownRush &lt;dbl&gt;, FirstDownPen &lt;dbl&gt;,
+## #   FirstDownTotal &lt;dbl&gt;, Penalties &lt;dbl&gt;, PenaltyYds &lt;dbl&gt;, Fumbles &lt;dbl&gt;,
+## #   Interceptions &lt;dbl&gt;, TotalTurnovers &lt;dbl&gt;, TeamFull &lt;chr&gt;, TeamURL &lt;chr&gt;,
+## #   DefPassingCmp &lt;dbl&gt;, DefPassingAtt &lt;dbl&gt;, DefPassingPct &lt;dbl&gt;, …</code></pre>
+<p>It looks better already, right? Well, there is parenthesis around the score and we don’t need them there anymore since we separated the W/L from the score. To do that, we need to get rid of the ‘(’ and the ‘)’, but NOT what’s inside of the parenthesis. This will take two lines of code to get rid of, since we don’t want to get rid of the entire thing.</p>
+<pre class="r"><code>badlogs  %&gt;% 
+  separate(Result, into=c(&quot;Outcome&quot;, &quot;Score&quot;), sep=&quot; &quot;) %&gt;%
+  separate(Outcome, into=c(&quot;W/L&quot;)) %&gt;%  mutate(Score=gsub(&quot;\\(&quot;,&quot;&quot;,Score)) %&gt;%
+  mutate(Score=gsub(&quot;\\)&quot;,&quot;&quot;,Score))</code></pre>
+<pre><code>## # A tibble: 1,662 × 52
+##     Game Date     HomeAway Opponent `W/L` Score PassingCmp PassingAtt PassingPct
+##    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+##  1     1 8/24/19  N        Miami (… W     24-20         17         27       63  
+##  2     2 9/7/19   &lt;NA&gt;     Tenness… W     45-0          30         36       83.3
+##  3     3 9/14/19  @        Kentucky W     29-21         21         30       70  
+##  4     4 9/21/19  &lt;NA&gt;     Tenness… W     34-3          24         34       70.6
+##  5     5 9/28/19  &lt;NA&gt;     Towson   W     38-0          24         28       85.7
+##  6     6 10/5/19  &lt;NA&gt;     Auburn   W     24-13         25         39       64.1
+##  7     7 10/12/19 @        Louisia… L     28-42         24         44       54.5
+##  8     8 10/19/19 @        South C… W     38-27         21         33       63.6
+##  9     9 11/2/19  N        Georgia  L     17-24         21         33       63.6
+## 10    10 11/9/19  &lt;NA&gt;     Vanderb… W     56-0          27         40       67.5
+## # … with 1,652 more rows, and 43 more variables: PassingYds &lt;dbl&gt;,
+## #   PassingTD &lt;dbl&gt;, RushingAtt &lt;dbl&gt;, RushingYds &lt;dbl&gt;, RushingAvg &lt;dbl&gt;,
+## #   RushingTD &lt;dbl&gt;, OffensivePlays &lt;dbl&gt;, OffensiveYards &lt;dbl&gt;,
+## #   OffenseAvg &lt;dbl&gt;, FirstDownPass &lt;dbl&gt;, FirstDownRush &lt;dbl&gt;,
+## #   FirstDownPen &lt;dbl&gt;, FirstDownTotal &lt;dbl&gt;, Penalties &lt;dbl&gt;,
+## #   PenaltyYds &lt;dbl&gt;, Fumbles &lt;dbl&gt;, Interceptions &lt;dbl&gt;, TotalTurnovers &lt;dbl&gt;,
+## #   TeamFull &lt;chr&gt;, TeamURL &lt;chr&gt;, DefPassingCmp &lt;dbl&gt;, DefPassingAtt &lt;dbl&gt;, …</code></pre>
+<p>Nice, looks good. Then we were asked to separate the Score and label them TeamScore and OpponentScore. In addition to this, we were asked to get rid of the ‘-’ in the middle of the scores as well.</p>
+<pre class="r"><code>badlogs  %&gt;% 
+  separate(Result, into=c(&quot;Outcome&quot;, &quot;Score&quot;), sep=&quot; &quot;) %&gt;%
+  separate(Outcome, into=c(&quot;W/L&quot;)) %&gt;%  mutate(Score=gsub(&quot;\\(&quot;,&quot;&quot;,Score)) %&gt;%
+  mutate(Score=gsub(&quot;\\)&quot;,&quot;&quot;,Score)) %&gt;% 
+  separate(Score, into =c(&quot;TeamScore&quot;, &quot;OpponentScore&quot;), sep = &quot;\\-&quot;) %&gt;% head()</code></pre>
+<pre><code>## # A tibble: 6 × 53
+##    Game Date    HomeAway Opponent         `W/L` TeamScore OpponentScore PassingCmp
+##   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;              &lt;dbl&gt;
+## 1     1 8/24/19 N        Miami (FL)       W     24        20                    17
+## 2     2 9/7/19  &lt;NA&gt;     Tennessee-Martin W     45        0                     30
+## 3     3 9/14/19 @        Kentucky         W     29        21                    21
+## 4     4 9/21/19 &lt;NA&gt;     Tennessee        W     34        3                     24
+## 5     5 9/28/19 &lt;NA&gt;     Towson           W     38        0                     24
+## 6     6 10/5/19 &lt;NA&gt;     Auburn           W     24        13                    25
+## # … with 45 more variables: PassingAtt &lt;dbl&gt;, PassingPct &lt;dbl&gt;,
+## #   PassingYds &lt;dbl&gt;, PassingTD &lt;dbl&gt;, RushingAtt &lt;dbl&gt;, RushingYds &lt;dbl&gt;,
+## #   RushingAvg &lt;dbl&gt;, RushingTD &lt;dbl&gt;, OffensivePlays &lt;dbl&gt;,
+## #   OffensiveYards &lt;dbl&gt;, OffenseAvg &lt;dbl&gt;, FirstDownPass &lt;dbl&gt;,
+## #   FirstDownRush &lt;dbl&gt;, FirstDownPen &lt;dbl&gt;, FirstDownTotal &lt;dbl&gt;,
+## #   Penalties &lt;dbl&gt;, PenaltyYds &lt;dbl&gt;, Fumbles &lt;dbl&gt;, Interceptions &lt;dbl&gt;,
+## #   TotalTurnovers &lt;dbl&gt;, TeamFull &lt;chr&gt;, TeamURL &lt;chr&gt;, DefPassingCmp &lt;dbl&gt;, …</code></pre>
+<p>Perfect, we did what was asked!! Now, we get to create a chart of the TeamScore and the OpponentScore to be able to visualize everything instead of looking at it in columns and rows.</p>
+<p>The first step we have to do is create a new field of our existing data so we don’t have to copy this code every single time. I named it “cleanlogs” since this is the cleaned up version of our badfootballlogs.</p>
+<pre class="r"><code>cleanlogs &lt;- badlogs  %&gt;% 
+  separate(Result, into=c(&quot;Outcome&quot;, &quot;Score&quot;), sep=&quot; &quot;) %&gt;%
+  separate(Outcome, into=c(&quot;W/L&quot;)) %&gt;%  mutate(Score=gsub(&quot;\\(&quot;,&quot;&quot;,Score)) %&gt;%
+  mutate(Score=gsub(&quot;\\)&quot;,&quot;&quot;,Score)) %&gt;% 
+  separate(Score, into =c(&quot;TeamScore&quot;, &quot;OpponentScore&quot;), sep = &quot;\\-&quot;) %&gt;%
+  mutate(TeamScore = as.numeric(TeamScore), OpponentScore = as.numeric(OpponentScore))</code></pre>
+<p>Once we’ve done that, we have to mutate a new field and do some math… (yay…). This will be our Differential.</p>
+<pre class="r"><code>cleanlogs %&gt;% 
+  mutate(Differential= TeamScore-OpponentScore)</code></pre>
+<pre><code>## # A tibble: 1,662 × 54
+##     Game Date     HomeAway Opponent         `W/L` TeamScore OpponentScore PassingCmp
+##    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;            &lt;chr&gt;     &lt;dbl&gt;         &lt;dbl&gt;      &lt;dbl&gt;
+##  1     1 8/24/19  N        Miami (FL)       W            24            20         17
+##  2     2 9/7/19   &lt;NA&gt;     Tennessee-Martin W            45             0         30
+##  3     3 9/14/19  @        Kentucky         W            29            21         21
+##  4     4 9/21/19  &lt;NA&gt;     Tennessee        W            34             3         24
+##  5     5 9/28/19  &lt;NA&gt;     Towson           W            38             0         24
+##  6     6 10/5/19  &lt;NA&gt;     Auburn           W            24            13         25
+##  7     7 10/12/19 @        Louisiana State  L            28            42         24
+##  8     8 10/19/19 @        South Carolina   W            38            27         21
+##  9     9 11/2/19  N        Georgia          L            17            24         21
+## 10    10 11/9/19  &lt;NA&gt;     Vanderbilt       W            56             0         27
+## # … with 1,652 more rows, and 46 more variables: PassingAtt &lt;dbl&gt;,
+## #   PassingPct &lt;dbl&gt;, PassingYds &lt;dbl&gt;, PassingTD &lt;dbl&gt;, RushingAtt &lt;dbl&gt;,
+## #   RushingYds &lt;dbl&gt;, RushingAvg &lt;dbl&gt;, RushingTD &lt;dbl&gt;, OffensivePlays &lt;dbl&gt;,
+## #   OffensiveYards &lt;dbl&gt;, OffenseAvg &lt;dbl&gt;, FirstDownPass &lt;dbl&gt;,
+## #   FirstDownRush &lt;dbl&gt;, FirstDownPen &lt;dbl&gt;, FirstDownTotal &lt;dbl&gt;,
+## #   Penalties &lt;dbl&gt;, PenaltyYds &lt;dbl&gt;, Fumbles &lt;dbl&gt;, Interceptions &lt;dbl&gt;,
+## #   TotalTurnovers &lt;dbl&gt;, TeamFull &lt;chr&gt;, TeamURL &lt;chr&gt;, DefPassingCmp &lt;dbl&gt;, …</code></pre>
+<p>Ok, cool we have a differential. Now we were asked to create a new dataframe and call that worstgames and show the games that had a differential of greater than 65 points.</p>
+<pre class="r"><code>worstgames &lt;-cleanlogs %&gt;% 
+  mutate(Differential = TeamScore-OpponentScore) %&gt;%
+  filter(Differential &gt; 65)</code></pre>
+<pre class="r"><code>head(worstgames)</code></pre>
+<pre><code>## # A tibble: 5 × 54
+##    Game Date    HomeAway Opponent       `W/L` TeamScore OpponentScore PassingCmp
+##   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;chr&gt;     &lt;dbl&gt;         &lt;dbl&gt;      &lt;dbl&gt;
+## 1     4 9/21/19 &lt;NA&gt;     Miami (OH)     W            76             5         22
+## 2     1 8/31/19 &lt;NA&gt;     Idaho          W            79             7         25
+## 3     1 8/31/19 &lt;NA&gt;     Howard         W            79             0         17
+## 4     2 9/7/19  &lt;NA&gt;     Nevada         W            77             6         27
+## 5     3 9/14/19 &lt;NA&gt;     Texas Southern W            77             6         22
+## # … with 46 more variables: PassingAtt &lt;dbl&gt;, PassingPct &lt;dbl&gt;,
+## #   PassingYds &lt;dbl&gt;, PassingTD &lt;dbl&gt;, RushingAtt &lt;dbl&gt;, RushingYds &lt;dbl&gt;,
+## #   RushingAvg &lt;dbl&gt;, RushingTD &lt;dbl&gt;, OffensivePlays &lt;dbl&gt;,
+## #   OffensiveYards &lt;dbl&gt;, OffenseAvg &lt;dbl&gt;, FirstDownPass &lt;dbl&gt;,
+## #   FirstDownRush &lt;dbl&gt;, FirstDownPen &lt;dbl&gt;, FirstDownTotal &lt;dbl&gt;,
+## #   Penalties &lt;dbl&gt;, PenaltyYds &lt;dbl&gt;, Fumbles &lt;dbl&gt;, Interceptions &lt;dbl&gt;,
+## #   TotalTurnovers &lt;dbl&gt;, TeamFull &lt;chr&gt;, TeamURL &lt;chr&gt;, DefPassingCmp &lt;dbl&gt;, …</code></pre>
+<p>There, the data is separated into 5 rows of teams who had a score differential higher than 65.</p>
+<p>Time for the fun part; putting the data into a scatter plot. We have to put the TeamScore on the x axis and the OpponentScore on the y axis. I am going to color it gray so that we can see which is the worst in the end.</p>
+<pre class="r"><code>ggplot() +
+  geom_point(data=cleanlogs, aes(x=TeamScore, y=OpponentScore), color=&quot;gray&quot;)</code></pre>
+<p><img src="/2021/10/25/cleaning-up-bad-football-data/index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Now, taking the code from above, I’m going to add data from worstgames, and color it red so we can actually tell the difference between the two data sets.</p>
+<pre class="r"><code>ggplot() +
+  geom_point(data=cleanlogs, aes(x=TeamScore, y=OpponentScore), color=&quot;gray&quot;) +
+  geom_point(data=worstgames, aes(x=TeamScore, y=OpponentScore), color=&quot;red&quot;)</code></pre>
+<p><img src="/2021/10/25/cleaning-up-bad-football-data/index_files/figure-html/unnamed-chunk-12-1.png" width="672" />
+As you can see, its pretty obvious where the worst score lies. Lets go ahead and put a circle around it anyways, just to show that you can, and incase the worst score was next to a big cluster of data.</p>
+<pre class="r"><code>ggplot() +
+  geom_point(data=cleanlogs, aes(x=TeamScore, y=OpponentScore), color=&quot;gray&quot;) +
+  geom_point(data=worstgames, aes(x=TeamScore, y=OpponentScore), color=&quot;red&quot;) +
+    geom_encircle(data=worstgames, aes(x=TeamScore, y=OpponentScore), s_shape=0, expand=0.02, colour=&quot;blue&quot;)</code></pre>
+<p><img src="/2021/10/25/cleaning-up-bad-football-data/index_files/figure-html/unnamed-chunk-13-1.png" width="672" />
+Now that there is a blue outline around the worst score, its time to add a header, some chatter, a source line and a credit line. I’m also going to add a theme to my chart to clean it up just a bit more and make it more organized.</p>
+<pre class="r"><code>ggplot() +
+  geom_point(data=cleanlogs, aes(x=TeamScore, y=OpponentScore), color=&quot;gray&quot;) +
+  geom_point(data=worstgames, aes(x=TeamScore, y=OpponentScore), color=&quot;red&quot;) +
+    geom_encircle(data=worstgames, aes(x=TeamScore, y=OpponentScore), s_shape=0, expand=0.02, colour=&quot;blue&quot;) +
+  labs(
+    title=&quot;Worst Games in College Football by Score Differential&quot;, subtitle=&quot;5 home teams won with over 70 points while the opposing team&#39; score was only single digits.&quot;,
+    caption=&quot;Source: Matt Waite | By Olivia Ramaekers&quot;
+  )  + theme_minimal()</code></pre>
+<p><img src="/2021/10/25/cleaning-up-bad-football-data/index_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 
     </div>
   </article>
@@ -122,6 +301,9 @@
 
 
     
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
 
     
   </body>
