@@ -83,7 +83,7 @@ library(ggrepel)
 library(ggbump)
 library(lubridate)
 library(tidyr)</code></pre>
-<p>Next, after I created my csv file, I created a field called “teamranks” so that all my data would be easy to access. All the data that I have acquired came from the www.prepvolleyball.com through a subscription.</p>
+<p>Next, after I created my csv file, I created a field called ‘teamranks’ so that all my data would be easy to access. All the data that I have acquired came from the www.prepvolleyball.com through a subscription.</p>
 <pre class="r"><code>teamranks &lt;- read_csv(&quot;teamranks1.csv&quot;)</code></pre>
 <p>Look-y Here! Instead of buying a subscription, you can use this to see what my csv data shows and see what team ranked where each year.</p>
 <pre class="r"><code>head(teamranks)</code></pre>
@@ -98,10 +98,10 @@ library(tidyr)</code></pre>
 ## # … with 4 more variables: 13 &lt;chr&gt;, 14 &lt;chr&gt;, 15 &lt;chr&gt;, ...17 &lt;chr&gt;</code></pre>
 <p>There is something wrong with my data though; its wide data. We learned in class how to change our data to make it longer, and therefore, easier to code with. Having your data formatted like mine makes it 10x harder to work with instead of just putting it into a simple table (aka making it longer) and going from there. In addition to making my data easier to work with, I also created a scoring system to show the magnitude of each team’s rank when my chart is complete. I then need to take this code chunk and make it a new field so that we don’t have to copy this code chunk every time we need it.</p>
 <pre class="r"><code>newranks &lt;- teamranks %&gt;% pivot_longer(cols=-Year, names_to=&quot;Rank&quot;, values_to=&quot;School&quot;) %&gt;% mutate(Rank=as.numeric(Rank), Score = 100-Rank) %&gt;% filter(Rank &lt; 16)</code></pre>
-<p>Lets create a new field so that we can actually see Nebraska’s ranks. I filtered the original teamranks data to just show Nebraska and each year they ranked.</p>
+<p>Lets create a new field so that we can actually see Nebraska’s ranks. I filtered the original ‘teamranks’ data to just show Nebraska and each year they were ranked.</p>
 <pre class="r"><code>nuranks &lt;- teamranks %&gt;% pivot_longer(cols=-&quot;Year&quot;, names_to=&quot;Rank&quot;, values_to=&quot;School&quot;) %&gt;% mutate(Rank=as.numeric(Rank), Score = 100-Rank) %&gt;% 
   filter(School == &quot;Nebraska&quot;) %&gt;% mutate(TeamYear = paste(School, Year, sep=&quot; &quot;))</code></pre>
-<p>Ok, so after adding the new nuranks field and adding a title, chatter, source and credit lines, this looks a lot better! I can actually read what teams are being shown, I can tell what bubbles are Nebraska (and I can see what year they are for); its nice and clean.</p>
+<p>After adding the new nuranks field and adding a title, chatter, source and credit lines, I can actually read what teams are being shown, I can tell what bubbles are Nebraska (and I can see what year they are for); its nice and clean.</p>
 <pre class="r"><code>ggplot() + 
   geom_point(data=newranks, aes(x=School, y=Rank, size=Score), alpha = .3) + 
   scale_size(range = c(3, 8), name=&quot;Rank Minus 100&quot;) + 
@@ -172,9 +172,13 @@ To start, like every chart, I have to create new fields that will read each of m
   )</code></pre>
 <p>Now it’s time to plot my data and create a dot for each year. I used the average of each year since, for the majority of the conferences, each had multiple teams ranked within a conference. Using each rank from each conference for each team would make the conference show up multiple times and look extremely messy. This is why I chose to go with the average ranking of each conference.</p>
 <p>To make this look presentable, I added the official Conference hex color and labeled where each conference started and ended during the 5 year span of rankings. I then added my title, chatter, source and credit lines for the finishing touches.</p>
-<pre class="r"><code>ggplot() + geom_bump(data=conferences, aes(x=Year, y=AverageRank, color=Conference)) + geom_point(data=conferences, aes(x=Year, y=AverageRank, color=Conference), size = 4) +
+<pre class="r"><code>ggplot() + geom_bump(data=conferences, aes(x=Year, y=AverageRank, color=Conference)) + 
+  geom_point(data=conferences, aes(x=Year, y=AverageRank, color=Conference), size = 4) +
   geom_text(data = conferences %&gt;% filter(Year == min(Year)), aes(x = Year - .2, y=AverageRank, label = Conference), size = 3, hjust = 1) +
-  geom_text(data = conferences %&gt;% filter(Year == max(Year)), aes(x = Year + .2, y=AverageRank, label = Conference), size = 3, hjust = 0) + scale_color_manual(values = c(&quot;#041e41&quot;,&quot;#ef483e&quot;, &quot;#1a427d&quot;, &quot;#0088ce&quot;, &quot;#004b91&quot;, &quot;#ffd046&quot;, &quot;#33cad1&quot;))+ scale_y_reverse() + theme_minimal() + 
+  geom_text(data = conferences %&gt;% filter(Year == max(Year)), aes(x = Year + .2, y=AverageRank, label = Conference), size = 3, hjust = 0) + 
+  scale_color_manual(values = c(&quot;#041e41&quot;,&quot;#ef483e&quot;, &quot;#1a427d&quot;, &quot;#0088ce&quot;, &quot;#004b91&quot;, &quot;#ffd046&quot;, &quot;#33cad1&quot;)) +
+  scale_y_reverse() + 
+  theme_minimal() + 
   labs(x= &quot;Year of Average Rank&quot;, y= &quot;Average Rank&quot;, title = &quot;SEC Leads the NCAA in In-Coming Player Average Rankings&quot;, subtitle = &quot;The Big Ten falls behind  due to their recruiting class in 2020&quot;, caption = &quot;Source: prepvolleyball.com | By Olivia Ramaekers&quot;) +
   theme(
     plot.title = element_text(size = 16, face = &quot;bold&quot;), 
