@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.88.1" />
+
+
+<title>How Does Nebraska Compare, Recruiting Wise, Next To All NCAA Volleyball Teams?  - Olivia Ramaeker&#39;s Blog</title>
+<meta property="og:title" content="How Does Nebraska Compare, Recruiting Wise, Next To All NCAA Volleyball Teams?  - Olivia Ramaeker&#39;s Blog">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">13 min read</span>
+    
+
+    <h1 class="article-title">How Does Nebraska Compare, Recruiting Wise, Next To All NCAA Volleyball Teams? </h1>
+
+    
+    <span class="article-date">2021-10-31</span>
+    
+
+    <div class="article-content">
+      
+<script src="/2021/10/31/how-does-nebraska-compare-recruiting-wise-next-to-all-ncaa-volleyball-teams/index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>Nebraska Volleyball has been a staple at the university for years now. The Huskers have consistently stayed ranked throughout the years and have many recognizable alumni. Though they have stayed ranked <em>during</em> the season, how did they look before the season? How did they rank when it came to recruiting classes?</p>
+<p>Before looking at any data, I need to download my libraries that will help me create all of charts.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.3     ✓ dplyr   1.0.7
+## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
+## ✓ readr   2.0.1     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(ggrepel)
+library(ggbump)
+library(lubridate)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
+<pre class="r"><code>library(tidyr)</code></pre>
+<p>Next, after I created my csv file, I created a field called “teamranks” so that all my data would be easy to access. All the data that I have acquired came from the www.prepvolleyball.com through a subscription.</p>
+<pre class="r"><code>teamranks &lt;- read_csv(&quot;teamranks1.csv&quot;)</code></pre>
+<p>Look-y Here! Instead of buying a subscription, you can use this to see what my csv data shows and see what team ranked where each year.</p>
+<pre class="r"><code>head(teamranks)</code></pre>
+<pre><code>## # A tibble: 5 × 17
+##    Year `1`    `2`   `3`   `4`   `5`   `6`   `7`   `8`   `9`   `10`  `11`  `12` 
+##   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1  2017 Texas  Wisc… UCLA  Minn… Kent… Nebr… Illi… Flor… Mich… Mary… Utah  Ariz…
+## 2  2018 Penn … Flor… Wash… Oreg… Nebr… Texas Aubu… BYU   Nort… Crei… UCLA  Mich…
+## 3  2019 Stanf… Nebr… Texas BYU   Ohio… TCU   Oreg… Purd… USC   Colo… Bayl… Kans…
+## 4  2020 Kentu… Minn… Texas Wisc… Mich… Ohio… Flor… Stan… Ariz… Notr… Kans… UCLA 
+## 5  2021 Nebra… Stan… Kent… Penn… Crei… BYU   USC   Minn… Bayl… Purd… Ohio… Kans…
+## # … with 4 more variables: 13 &lt;chr&gt;, 14 &lt;chr&gt;, 15 &lt;chr&gt;, ...17 &lt;chr&gt;</code></pre>
+<p>There is something wrong with my data though; its wide data. We learned in class how to change our data to make it longer, and therefore, easier to code with. Having your data formatted like mine makes it 10x harder to work with instead of just putting it into a simple table (aka making it longer) and going from there. In addition to making my data easier to work with, I also created a scoring system to show the magnitude of each team’s rank when my chart is complete. I then need to take this code chunk and make it a new field so that we don’t have to copy this code chunk every time we need it.</p>
+<pre class="r"><code>newranks &lt;- teamranks %&gt;% pivot_longer(cols=-Year, names_to=&quot;Rank&quot;, values_to=&quot;School&quot;) %&gt;% mutate(Rank=as.numeric(Rank), Score = 100-Rank) %&gt;% filter(Rank &lt; 16)</code></pre>
+<p>So after plotting my data, it honestly looks like a garbage fire. I can’t read any of the names on the bottom, I don’t understand what the dots mean and I can’t tell what dot represents the Huskers…</p>
+<pre class="r"><code>ggplot() + geom_point(data=newranks, aes(x=School, y=Year, size=Score), alpha = .3) + 
+  scale_size(range = c(1, 6), name=&quot;Rank Minus 100&quot;)</code></pre>
+<p><img src="/2021/10/31/how-does-nebraska-compare-recruiting-wise-next-to-all-ncaa-volleyball-teams/index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+Lets create a new field so that we can actually see Nebraska’s ranks. I filtered the original teamranks data to just show Nebraska and each year they ranked.</p>
+<pre class="r"><code>nuranks &lt;- teamranks %&gt;% pivot_longer(cols=-&quot;Year&quot;, names_to=&quot;Rank&quot;, values_to=&quot;School&quot;) %&gt;% mutate(Rank=as.numeric(Rank), Score = 100-Rank) %&gt;% 
+  filter(School == &quot;Nebraska&quot;) %&gt;% mutate(TeamYear = paste(School, Year, sep=&quot; &quot;))</code></pre>
+<p>Ok, so after adding the new nuranks field and adding a title, chatter, source and credit lines, this looks a lot better! I can actually read what teams are being shown, I can tell what bubbles are Nebraska (and I can see what year they are for); its nice and clean.</p>
+<pre class="r"><code>ggplot() + 
+  geom_point(data=newranks, aes(x=School, y=Rank, size=Score), alpha = .3) + 
+  scale_size(range = c(3, 8), name=&quot;Rank Minus 100&quot;) + 
+  geom_point(
+    data=nuranks,
+    aes(x=School, y=Rank, size=Score), color=&quot;#e41c38&quot;) +
+geom_text(data=nuranks, aes(x=School, y=Rank, label=TeamYear,  hjust=1.15)) + theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90)
+    ) +
+  labs(x= &quot;NCAA Team&quot;, y=&quot;Rank&quot;, title = &quot;Nebraska Keeps Their Top 5 Ranking (Usually)&quot;, subtitle=&quot;In 2020, Husker Volleyball ranked 26th overall in recruiting class, ruining their Top 10 streak&quot;, caption = &quot;Source: prepvolleyball.com | By Olivia Ramaekers&quot;) +
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;), 
+    axis.title = element_text(size = 10), 
+    plot.subtitle = element_text(size = 10, face=&quot;italic&quot;), 
+  )</code></pre>
+<p><img src="/2021/10/31/how-does-nebraska-compare-recruiting-wise-next-to-all-ncaa-volleyball-teams/index_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+From this bubble chart, you can see that Nebraska ranks towards the top quite often. The one year that isn’t on the chart, 2020, the Huskers only had 3 incoming recruits; many of them not ranked within the top 150 high school players in the country. This is why Nebraska wasn’t ranked in the top 15 college teams in 2020.</p>
+<p>Now to zone in on Nebraska’s Conference; The Big Ten. Lets create a bar chart that shows how often a team in the Big Ten Conference appeared in the Top 15 from 2017 to 2021
+To start any chart, I need to create a field that reads my csv file.</p>
+<pre class="r"><code>conf2017 &lt;- read_csv(&quot;stats2017.csv&quot;)</code></pre>
+<pre><code>## Rows: 15 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (4): Team, Conference, PrimaryColor, SecondaryColor
+## dbl (2): Year, Rank</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>And here is what that data looks like.</p>
+<pre class="r"><code>head(conf2017)</code></pre>
+<pre><code>## # A tibble: 6 × 6
+##    Year  Rank Team      Conference PrimaryColor SecondaryColor
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt;        &lt;chr&gt;         
+## 1  2017     1 Texas     Big 12     #bf5700      #333f48       
+## 2  2017     2 Wisconsin Big Ten    #c5050c      #ffffff       
+## 3  2017     3 UCLA      Pac 12     #2d68c4      #f2a900       
+## 4  2017     4 Minnesota Big Ten    #7a0019      #ffcc33       
+## 5  2017     5 Kentucky  SEC        #0033a0      #000000       
+## 6  2017     6 Nebraska  Big Ten    #e41c38      #fdf2d9</code></pre>
+<p>Next, I’ll group this by the Team and the Conference, then specifically filter out all of the Conferences except for the Big Ten. From there I will create a new field: bigten1</p>
+<pre class="r"><code>conf2017 %&gt;% 
+group_by(Team, Conference) %&gt;% 
+  filter(Conference == &quot;Big Ten&quot;) -&gt; bigten1</code></pre>
+<p>This is what it looks like as a table…</p>
+<pre class="r"><code>head(bigten1)</code></pre>
+<pre><code>## # A tibble: 6 × 6
+## # Groups:   Team, Conference [6]
+##    Year  Rank Team           Conference PrimaryColor SecondaryColor
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;        &lt;chr&gt;         
+## 1  2017     2 Wisconsin      Big Ten    #c5050c      #ffffff       
+## 2  2017     4 Minnesota      Big Ten    #7a0019      #ffcc33       
+## 3  2017     6 Nebraska       Big Ten    #e41c38      #fdf2d9       
+## 4  2017     7 Illinois       Big Ten    #13294b      #e84a27       
+## 5  2017     9 Michigan State Big Ten    #18453b      #ffffff       
+## 6  2017    10 Maryland       Big Ten    #e03a3e      #ffd520</code></pre>
+<p>This is what my data looks like plotted as a bar chart. Nice so far right? Well… not exactly… Do you see a problem? I wanted to include data from 2017 <em>to</em> 2021, and this only shows 2017. So now I have to somehow put all of my csv files together and create one big csv file.</p>
+<pre class="r"><code>ggplot() + geom_bar(data=bigten1, aes(x=Team, weight=Rank, fill=Team)) +theme_minimal()</code></pre>
+<p><img src="/2021/10/31/how-does-nebraska-compare-recruiting-wise-next-to-all-ncaa-volleyball-teams/index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>I will repeat the previous steps that I did for the conf2017 field and do that for all of my csv files for this chart (which is tedious, but needs to be done).</p>
+<pre class="r"><code>conf2018 &lt;- read_csv(&quot;stats2018.csv&quot;)</code></pre>
+<pre><code>## Rows: 15 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (4): Team, Conference, PrimaryColor, SecondaryColor
+## dbl (2): Year, Rank</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>conf2019 &lt;- read_csv(&quot;stats2019.csv&quot;)</code></pre>
+<pre><code>## Rows: 15 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (4): Team, Conference, PrimaryColor, SecondaryColor
+## dbl (2): Year, Rank</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>conf2020 &lt;- read_csv(&quot;stats2020.csv&quot;)</code></pre>
+<pre><code>## Rows: 16 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (4): Team, Conference, PrimaryColor, SecondaryColor
+## dbl (2): Year, Rank</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>conf2021 &lt;- read_csv(&quot;stats2021.csv&quot;)</code></pre>
+<pre><code>## Rows: 15 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (4): Team, Conference, PrimaryColor, SecondaryColor
+## dbl (2): Year, Rank</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>Alright, now that that has been done, I need to combine all of the fields. Using ‘rbind’, I can combine multiple fields and clump it into one. I’ll name this new field ‘conf’.</p>
+<pre class="r"><code>conf &lt;- rbind(conf2017, conf2018, conf2019, conf2020, conf2021) </code></pre>
+<p>From there, I will group and filter my new field. To make sure that all the ranks are equal, I mutate my new field and make sure that each rank is equal to 1. I want my data to show <em>if</em> they appeared in the top 15, not <em>where</em> they appeared in the top 15. Because of this, I had to make all the ranks equal to each other, otherwise my chart would look like a disaster. Then I organized my data by year.</p>
+<pre class="r"><code>bigconf &lt;- conf %&gt;% 
+  group_by(Team, Conference) %&gt;% 
+  filter(Conference== &quot;Big Ten&quot;) %&gt;% 
+   mutate(Rank = 1) %&gt;%
+  arrange(Year)</code></pre>
+<p>Now that we have this plotted, you can actually see who was ranked during which year. Personally, those colors are distracting, super bright and its hard to compare Minnesota and Nebraska without having to squint and have my face sitting two inches away from my computer screen. Let’s fix that.</p>
+<pre class="r"><code>ggplot() + geom_bar(data=bigconf, aes(x=Year, weight=Rank, fill=Team)) +theme_minimal() </code></pre>
+<p><img src="/2021/10/31/how-does-nebraska-compare-recruiting-wise-next-to-all-ncaa-volleyball-teams/index_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>I changed the colors to be the official hex color for each Big Ten team in the order that it shows to the right of the chart. If I were to switch the first hex color with the last one, it would give Illinois’ orange to Wisconsin and Wisconsin’s red to Illinois.</p>
+<pre class="r"><code>ggplot() + geom_bar(data=bigconf, aes(x=Year, weight=Rank, fill=Team)) +theme_minimal() + 
+scale_fill_manual(values=c(&quot;#e84a27&quot;, &quot;#990000&quot;, &quot;#ffd520&quot;, &quot;#00274c&quot;,&quot;#18453b&quot;,&quot;#7a0019&quot;,&quot;#e41c38&quot;, &quot;#666666&quot;, &quot;#041e42&quot;, &quot;#ceb888&quot;, &quot;#c5050c&quot;))</code></pre>
+<p><img src="/2021/10/31/how-does-nebraska-compare-recruiting-wise-next-to-all-ncaa-volleyball-teams/index_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>From there, I can add my title, chatter, source and credit lines as finishing touches.</p>
+<pre class="r"><code>ggplot() + geom_bar(data=bigconf, aes(x=Year, weight=Rank, fill=Team)) + 
+  labs (
+    x=&quot;Year of Recruiting Class&quot;, 
+    y= &quot;Teams Ranked in Top 15&quot;, 
+    title=&quot;The Big Ten Consistently Ranks Through the Years&quot;, 
+    subtitle=&quot;At Least 5 Volleyball Programs Help Keep the Conference&#39;s Name in the Conversation&quot;, 
+    caption = &quot;Source: prepvolleyball.com | By Olivia Ramaekers &quot;
+  ) +
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 20, face = &quot;bold&quot;), 
+    plot.subtitle = element_text(size = 10, face = &quot;italic&quot;)
+  ) +
+scale_fill_manual(values=c(&quot;#e84a27&quot;, &quot;#990000&quot;, &quot;#ffd520&quot;, &quot;#00274c&quot;,&quot;#18453b&quot;,&quot;#7a0019&quot;,&quot;#e41c38&quot;, &quot;#666666&quot;, &quot;#041e42&quot;, &quot;#ceb888&quot;, &quot;#c5050c&quot;))</code></pre>
+<p><img src="/2021/10/31/how-does-nebraska-compare-recruiting-wise-next-to-all-ncaa-volleyball-teams/index_files/figure-html/unnamed-chunk-21-1.png" width="672" />
+Looking at this chart, you can see that the Big Ten excels in the NCAA Volleyball Program when it comes to recruitment rankings. Though some teams only appear once or twice, many of the Big Ten teams carry the Conference by appearing more than others.</p>
+<p>To continue looking at conferences, my third and final chart will be a bump chart showing each NCAA Conference’s average recruitment ranking from 2017 to 2021.
+To start, like every chart, I have to create new fields that will read each of my csv files.</p>
+<pre class="r"><code>conf2017 &lt;- read_csv(&quot;stats2017.csv&quot;)</code></pre>
+<pre><code>## Rows: 15 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (4): Team, Conference, PrimaryColor, SecondaryColor
+## dbl (2): Year, Rank</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>conf2018 &lt;- read_csv(&quot;stats2018.csv&quot;)</code></pre>
+<pre><code>## Rows: 15 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (4): Team, Conference, PrimaryColor, SecondaryColor
+## dbl (2): Year, Rank</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>conf2019 &lt;- read_csv(&quot;stats2019.csv&quot;)</code></pre>
+<pre><code>## Rows: 15 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (4): Team, Conference, PrimaryColor, SecondaryColor
+## dbl (2): Year, Rank</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>conf2020 &lt;- read_csv(&quot;stats2020.csv&quot;)</code></pre>
+<pre><code>## Rows: 16 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (4): Team, Conference, PrimaryColor, SecondaryColor
+## dbl (2): Year, Rank</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>conf2021 &lt;- read_csv(&quot;stats2021.csv&quot;)</code></pre>
+<pre><code>## Rows: 15 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (4): Team, Conference, PrimaryColor, SecondaryColor
+## dbl (2): Year, Rank</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>Alright, now that that is done, I need to combine all my new fields. Like my bar chart above, I have to use ‘rbind’ to combine each of my csv files and clump them into one. I then group it by the conference and the year of each of my files and summarise it by the mean of the conference’s rank for that year. I name that ‘AverageRank’, which comes in handy later.</p>
+<pre class="r"><code>conferences &lt;- rbind(conf2017, conf2018, conf2019, conf2020, conf2021) %&gt;% 
+  group_by(Conference, Year) %&gt;%
+  summarize(
+    AverageRank = mean(Rank)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Conference&#39;. You can override using the `.groups` argument.</code></pre>
+<p>Now it’s time to plot my data and create a dot for each year. I used the average of each year since, for the majority of the conferences, each had multiple teams ranked within a conference. Using each rank from each conference for each team would make the conference show up multiple times and look extremely messy. This is why I chose to go with the average ranking of each conference.</p>
+<pre class="r"><code>ggplot() + geom_bump(data=conferences, aes(x=Year, y=AverageRank, color=Conference)) + geom_point(data=conferences, aes(x=Year, y=AverageRank, color=Conference), size = 4) + scale_y_reverse()</code></pre>
+<p><img src="/2021/10/31/how-does-nebraska-compare-recruiting-wise-next-to-all-ncaa-volleyball-teams/index_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p>To make this look presentable, I added the official Conference hex color and labeled where each conference started and ended during the 5 year span of rankings. I then added my title, chatter, source and credit lines for the finishing touches.</p>
+<pre class="r"><code>ggplot() + geom_bump(data=conferences, aes(x=Year, y=AverageRank, color=Conference)) + geom_point(data=conferences, aes(x=Year, y=AverageRank, color=Conference), size = 4) +
+  geom_text(data = conferences %&gt;% filter(Year == min(Year)), aes(x = Year - .2, y=AverageRank, label = Conference), size = 3, hjust = 1) +
+  geom_text(data = conferences %&gt;% filter(Year == max(Year)), aes(x = Year + .2, y=AverageRank, label = Conference), size = 3, hjust = 0) + scale_color_manual(values = c(&quot;#041e41&quot;,&quot;#ef483e&quot;, &quot;#1a427d&quot;, &quot;#0088ce&quot;, &quot;#004b91&quot;, &quot;#ffd046&quot;, &quot;#33cad1&quot;))+ scale_y_reverse() + theme_minimal() + 
+  labs(x= &quot;Year of Average Rank&quot;, y= &quot;Average Rank&quot;, title = &quot;SEC Leads the NCAA in In-Coming Player Average Rankings&quot;, subtitle = &quot;The Big Ten falls behind  due to their recruiting class in 2020&quot;, caption = &quot;Source: prepvolleyball.com | By Olivia Ramaekers&quot;) +
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;), 
+    plot.subtitle = element_text(size = 10, face = &quot;italic&quot;)
+  ) </code></pre>
+<p><img src="/2021/10/31/how-does-nebraska-compare-recruiting-wise-next-to-all-ncaa-volleyball-teams/index_files/figure-html/unnamed-chunk-29-1.png" width="672" />
+Despite the Big Ten having many teams rank, SEC actually comes out on top. Looking back, SEC doesn’t have very many teams that were ranked for their recruits. Those that were ranked were ranked higher, which is why SEC stands out when compared to the Big Ten.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+
