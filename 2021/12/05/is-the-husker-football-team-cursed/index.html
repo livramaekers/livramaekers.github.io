@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.88.1" />
+
+
+<title>Is the Husker Football Team Cursed? - Olivia Ramaeker&#39;s Blog</title>
+<meta property="og:title" content="Is the Husker Football Team Cursed? - Olivia Ramaeker&#39;s Blog">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">9 min read</span>
+    
+
+    <h1 class="article-title">Is the Husker Football Team Cursed?</h1>
+
+    
+    <span class="article-date">2021-12-05</span>
+    
+
+    <div class="article-content">
+      
+<script src="/2021/12/05/is-the-husker-football-team-cursed/index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>Husker Football has suffered greatly over the past few years. The number of fans wanting Frost to be fired has grown, but so has the number of fans supporting Frost and the team’s comeback story. So, what’s the deal? Is Nebraska unlucky, or do they actually just suck?</p>
+<p>To even begin figuring out that answer, I need to download all of my libraries that I will need to create these charts.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.3     ✓ dplyr   1.0.7
+## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
+## ✓ readr   2.0.1     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(cowplot)
+library(waffle)
+library(ggbump)</code></pre>
+<p>Next, I created a csv file of the data that I want to look at; Nebraska’s Wins and Losses since Scott Frost started at Nebraska. I created a field called “record” so thatI can access my data easily in the future. This data was found at CollegeFootballData.com.</p>
+<pre class="r"><code>record &lt;- read_csv(&quot;ch1data.csv&quot;)</code></pre>
+<pre><code>## Rows: 70 Columns: 14</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (3): Team, Conference, Division
+## dbl (11): Year, Expected Wins, Total Games, Total Wins, Total Losses, Confer...</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>Then, I need to filter down my original field, so that I’m only looking at the Big Ten Conference.</p>
+<pre class="r"><code>bigtenrecord &lt;- record %&gt;% filter(Conference == &quot;Big Ten&quot;)</code></pre>
+<p>Next, I need to create two bump charts that highlight Nebraska’s record throughout Frost’s career. Since I only want to highlight the Huskers, I need to make every other Big Ten team “gray”, and show Nebraska in their ‘Scarlet’. To do this, I have to go down in order of how each team is listed and add what color I want them to appear as.</p>
+<pre class="r"><code>bar1 &lt;- ggplot() + geom_bump(data = bigtenrecord, aes(x=Year, y= `Total Wins`, group=Team, color=Team)) + scale_y_continuous(limits=c(0, 15)) + labs(title = &quot;NU&#39;s Wins...&quot;, subtitle = &quot;Looking at Scott&#39;s coaching career at Nebraska shows why&quot;, x=&quot;Year&quot;, y=&quot;Total Wins&quot;, caption = &quot;          &quot;) + theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    plot.caption = element_text(size = 5),
+    panel.grid.minor = element_blank()) + 
+  geom_point(data= bigtenrecord, aes(x=Year, y=`Total Wins`, group= Team, color=Team), size = 4) +
+  scale_color_manual(values= c(&quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;,&quot;gray&quot;,&quot;gray&quot;,&quot;#e41c38&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;,&quot;gray&quot;, &quot;gray&quot;))</code></pre>
+<pre class="r"><code>bar2 &lt;- ggplot() + geom_bump(data= bigtenrecord, aes(x=Year, y= `Total Losses`, group=Team, color=Team)) + scale_y_continuous(limits=c(0, 15)) + labs(title = &quot;vs Losses in the Frost Era&quot;, subtitle = &quot;fans are upset and want him kicked to the curb&quot;, x=&quot;Year&quot;, y=&quot;Total Losses&quot;, caption = &quot;Source: CollegeFootballData.com | By Olivia Ramaekers &quot;) + theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()) +
+  geom_point(data= bigtenrecord, aes(x=Year, y=`Total Losses`, group= Team, color=Team), size = 4) +
+  scale_color_manual(values= c(&quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;,&quot;gray&quot;,&quot;gray&quot;,&quot;#e41c38&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;,&quot;gray&quot;, &quot;gray&quot;))</code></pre>
+<p>Now that the charts are created, I need to adjust them so that the data is visible and can be easily understood. I changed the width and the height of the data so you can see the (negative) progression throughout Frost’s 5 years.</p>
+<pre class="r"><code>plot_grid(bar1, bar2)</code></pre>
+<p><img src="/2021/12/05/is-the-husker-football-team-cursed/index_files/figure-html/unnamed-chunk-6-1.png" width="768" />
+From this chart, the fans arguing for Scott to close this chapter make a great point. Scott and the Huskers haven’t won more than 5 games in years (their losing record is the only thing that stays above the number 5).</p>
+<p>Ok, so let’s try and pin-point where this dumpster fire actually is. Is it the Offense? The Defense? The Coaching? I’m going to show the performance of the defense over Frost’s coaching career.</p>
+<p>Since I have 5 years of data, I need to create a field for all of them, and combine all 5 of those fields into one. using ‘rbind’ will combine each of the fields into one</p>
+<pre class="r"><code>d21&lt;- read_csv(&quot;footballlogs21-2.csv&quot;)</code></pre>
+<pre><code>## Rows: 740 Columns: 54</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr   (8): HomeAway, Opponent, Result, TeamFull, TeamURL, Outcome, Team, Con...
+## dbl  (45): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, ...
+## date  (1): Date</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>d20&lt;- read_csv(&quot;footballlogs20.csv&quot;)</code></pre>
+<pre><code>## Rows: 1100 Columns: 54</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr   (8): HomeAway, Opponent, Result, TeamFull, TeamURL, Outcome, Team, Con...
+## dbl  (45): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, ...
+## date  (1): Date</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>d19&lt;- read_csv(&quot;footballlogs19.csv&quot;)</code></pre>
+<pre><code>## Rows: 1662 Columns: 54</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr   (8): HomeAway, Opponent, Result, TeamFull, TeamURL, Outcome, Team, Con...
+## dbl  (45): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, ...
+## date  (1): Date</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>d18&lt;- read_csv(&quot;footballlogs18.csv&quot;)</code></pre>
+<pre><code>## Rows: 1656 Columns: 54</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr   (8): HomeAway, Opponent, Result, TeamFull, TeamURL, Outcome, Team, Con...
+## dbl  (45): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, ...
+## date  (1): Date</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>d17&lt;- read_csv(&quot;footballlogs17.csv&quot;)</code></pre>
+<pre><code>## Rows: 1650 Columns: 54</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr   (8): HomeAway, Opponent, Result, TeamFull, TeamURL, Outcome, Team, Con...
+## dbl  (45): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, ...
+## date  (1): Date</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>defensestats &lt;- rbind(d17, d18, d19, d20, d21)</code></pre>
+<p>Next, I need to filter out all teams in this data set so that I’m only looking at the Cornhuskers.</p>
+<pre class="r"><code>nu &lt;- defensestats %&gt;% 
+  filter (Team == &quot;Nebraska&quot;)</code></pre>
+<p>Next, I’m going to be looking at the Defensive Rushing Average, the Defensive Yardage, and to compare, the Offensive Yardage.</p>
+<pre class="r"><code>rushavg &lt;- ggplot() + geom_line(data=nu, aes(x=Date, y=DefRushingAvg, group=1)) +
+  labs (title = &quot;Nebraska&#39;s Defense Shows Minimal&quot;, subtitle = &quot;Though the Husker Offense suffers,&quot;, x= &quot;Season&quot;, y= &quot;DefRushingAvg&quot;) + 
+  theme_minimal() + 
+  theme (
+    plot.title = element_text(size = 13, face = &quot;bold&quot;), 
+    axis.title = element_text(size=8), 
+    plot.subtitle = element_text(size=10),
+    panel.grid.minor = element_blank ()
+  ) +  facet_wrap(~Team)</code></pre>
+<pre class="r"><code>defyard &lt;- ggplot() + geom_line(data=nu, aes(x=Date, y=DefYards, group=1)) +
+  labs (title = &quot;Improvement Over the Years&quot;, subtitle = &quot;the Defense needs more attention.&quot;, x= &quot;Season&quot;, y= &quot;DefYards&quot;) + 
+  theme_minimal() + 
+  theme (
+    plot.title = element_text(size = 13, face = &quot;bold&quot;), 
+    axis.title = element_text(size=8), 
+    plot.subtitle = element_text(size=10),
+    panel.grid.minor = element_blank ()
+  ) +  facet_wrap(~Team)</code></pre>
+<pre class="r"><code>offyds &lt;- ggplot() + geom_line(data=nu, aes(x=Date, y=OffensiveYards, group=1))+
+  labs (title = &quot;            &quot;, subtitle = &quot;The Offense has gotten more yards quicker than the latter&quot;, x= &quot;Season&quot;, y= &quot;OffensiveYards&quot;, caption = &quot;Source: College Football Reference | By Olivia Ramaekers &quot;) + 
+  theme_minimal() + 
+  theme (
+    plot.title = element_text(size = 13, face = &quot;bold&quot;), 
+    axis.title = element_text(size=8), 
+    plot.subtitle = element_text(size=10),
+    panel.grid.minor = element_blank ()
+  ) +  facet_wrap(~Team)</code></pre>
+<p>Since I have 3 different graphs, I have to combine them and make a new field. I then need to fix the width of the charts so that they are equal in size and are legible.</p>
+<pre class="r"><code>combined &lt;- plot_grid(rushavg, defyard, offyds)</code></pre>
+<pre class="r"><code>combined</code></pre>
+<p><img src="/2021/12/05/is-the-husker-football-team-cursed/index_files/figure-html/unnamed-chunk-18-1.png" width="576" />
+From what I’ve heard around me, the Offense takes a lot of heat for bad plays and not running the ball (though it may be slightly true). These charts, however, show me that the Defense also needs more attention as well. The Defensive Yards over the past 5 years has gone down, which might contribute to “feeling cursed” and losing by one score A LOT.</p>
+<p>Speaking of losing by one score, this football season had WAYYYYYY too many games where the final score was determined by a touchdown or less. Let’s take a look at not only the 2021 season, but the 2020 and the 2019 season to see how many games we lost by one score.</p>
+<p>First, I need to create 3 different fields (for the 21, 20, and 19 seasons), that show how many losses we had by more than one score, and by one score.</p>
+<pre class="r"><code>losses21 &lt;- c(&quot;Losses By One Score&quot; = 8, &quot;Losses by More Than One Score&quot; = 1)</code></pre>
+<pre class="r"><code>losses20 &lt;- c(&quot;Losses By One Score&quot;= 3, &quot;Losses by More Than One Score&quot; =2, 4)</code></pre>
+<pre class="r"><code>losses19 &lt;- c(&quot;Losses By One Score&quot;= 4, &quot;Losses by More Than One Score&quot; =3, 2)</code></pre>
+<p>Then, I need to iron my data out so I can compare the years.</p>
+<pre class="r"><code>iron(
+  waffle(losses21,
+         2,
+         xlab = &quot;Nebraska&#39;s 2021 Losses&quot;,
+         colors = c(&quot;#E41C38&quot;, &quot;black&quot;)) + 
+  labs(
+    title = &quot;How Many Games Have the Huskers Lost By One Score?&quot;, 
+    subtitle = &quot;Fans swear that Nebraska is cursed, despite looking at previous years&quot;) + 
+  theme_minimal() + 
+  theme (
+    plot.title = element_text(size = 13, face = &quot;bold&quot;), 
+    axis.title = element_text(size=8), 
+    plot.subtitle = element_text(size=10),
+    panel.grid.minor = element_blank ()
+    ) +
+  theme (
+    plot.title = element_text(size = 13, face = &quot;bold&quot;),
+    axis.title = element_text(size=8),
+    plot.subtitle = element_text(size=10),
+    panel.grid.minor = element_blank()
+),
+  waffle(losses20,
+         2,
+         xlab = &quot;Nebraska&#39;s 2020 Losses&quot;,
+         colors = c(&quot;#E41C38&quot;, &quot;black&quot;,&quot;white&quot;)),
+  waffle(losses19,
+         2,
+         xlab = &quot;Nebraska&#39;s 2019 Losses&quot;,
+         colors = c(&quot;#E41C38&quot;, &quot;black&quot;, &quot;white&quot;)) + 
+  labs(caption = &quot;Source: College Football Reference | By Olivia Ramaekers &quot;) + 
+  theme_minimal() + 
+  theme (
+    plot.title = element_text(size = 13, face = &quot;bold&quot;), 
+    axis.title = element_text(size=8), 
+    plot.subtitle = element_text(size=10),
+    panel.grid.minor = element_blank ()
+  )
+  ) </code></pre>
+<p><img src="/2021/12/05/is-the-husker-football-team-cursed/index_files/figure-html/unnamed-chunk-22-1.png" width="672" />
+So, looking at this chart, the Husker Curse seems to be real. We had double the amount of games losing by one score in 2021 than in 2019. We lost a total of 9 games in the 2021 season (ouch), and 8 of them were within one score of winning. As a Husker fan, our losing score against Michigan (32-29) is looking pretty good compared to ranked No.17 Iowa, losing to ranked No. 2 Michigan, 42 - 3.</p>
+<p>With that being said, I believe that this team is slightly unlucky. We had the majority of our coaches fired before the end of the year, our starting quarterback benched due to surgery, etc. Scott Frost’s record, though gruesome here, has been great at USC and Oregon. Change doesn’t come in one or five years; it takes time. Though this team is unlucky right now, I have a strong feeling that this team will turn around and will have a great comeback story in the near future.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+
