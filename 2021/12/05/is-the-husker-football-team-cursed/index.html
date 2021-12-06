@@ -106,7 +106,7 @@ library(ggbump)</code></pre>
   scale_color_manual(values= c(&quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;,&quot;gray&quot;,&quot;gray&quot;,&quot;#e41c38&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;, &quot;gray&quot;,&quot;gray&quot;, &quot;gray&quot;))</code></pre>
 <p>Now that the charts are created, I need to adjust them so that the data is visible and can be easily understood. I changed the width and the height of the data so you can see the (negative) progression throughout Frost’s 5 years.</p>
 <pre class="r"><code>plot_grid(bar1, bar2)</code></pre>
-<p><img src="/2021/12/05/is-the-husker-football-team-cursed/index_files/figure-html/unnamed-chunk-6-1.png" width="768" />
+<p><img src="/2021/12/05/is-the-husker-football-team-cursed/index_files/figure-html/unnamed-chunk-6-1.png" width="960" />
 From this chart, the fans arguing for Scott to close this chapter make a great point. Scott and the Huskers haven’t won more than 5 games in years (their losing record is the only thing that stays above the number 5).</p>
 <p>Ok, so let’s try and pin-point where this dumpster fire actually is. Is it the Offense? The Defense? The Coaching? I’m going to show the performance of the defense over Frost’s coaching career.</p>
 <p>Since I have 5 years of data, I need to create a field for all of them, and combine all 5 of those fields into one. using ‘rbind’ will combine each of the fields into one</p>
