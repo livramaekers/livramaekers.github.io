@@ -62,7 +62,7 @@
 
   <article class="article">
     
-    <span class="article-duration">9 min read</span>
+    <span class="article-duration">7 min read</span>
     
 
     <h1 class="article-title">Is the Husker Football Team Cursed?</h1>
@@ -78,28 +78,12 @@
 
 <p>Husker Football has suffered greatly over the past few years. The number of fans wanting Frost to be fired has grown, but so has the number of fans supporting Frost and the team’s comeback story. So, what’s the deal? Is Nebraska unlucky, or do they actually just suck?</p>
 <p>To even begin figuring out that answer, I need to download all of my libraries that I will need to create these charts.</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
-<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-## ✓ tibble  3.1.3     ✓ dplyr   1.0.7
-## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
-## ✓ readr   2.0.1     ✓ forcats 0.5.1</code></pre>
-<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>library(cowplot)
+<pre class="r"><code>library(tidyverse)
+library(cowplot)
 library(waffle)
 library(ggbump)</code></pre>
 <p>Next, I created a csv file of the data that I want to look at; Nebraska’s Wins and Losses since Scott Frost started at Nebraska. I created a field called “record” so thatI can access my data easily in the future. This data was found at CollegeFootballData.com.</p>
 <pre class="r"><code>record &lt;- read_csv(&quot;ch1data.csv&quot;)</code></pre>
-<pre><code>## Rows: 70 Columns: 14</code></pre>
-<pre><code>## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr  (3): Team, Conference, Division
-## dbl (11): Year, Expected Wins, Total Games, Total Wins, Total Losses, Confer...</code></pre>
-<pre><code>## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <p>Then, I need to filter down my original field, so that I’m only looking at the Big Ten Conference.</p>
 <pre class="r"><code>bigtenrecord &lt;- record %&gt;% filter(Conference == &quot;Big Ten&quot;)</code></pre>
 <p>Next, I need to create two bump charts that highlight Nebraska’s record throughout Frost’s career. Since I only want to highlight the Huskers, I need to make every other Big Ten team “gray”, and show Nebraska in their ‘Scarlet’. To do this, I have to go down in order of how each team is listed and add what color I want them to appear as.</p>
@@ -127,55 +111,10 @@ From this chart, the fans arguing for Scott to close this chapter make a great p
 <p>Ok, so let’s try and pin-point where this dumpster fire actually is. Is it the Offense? The Defense? The Coaching? I’m going to show the performance of the defense over Frost’s coaching career.</p>
 <p>Since I have 5 years of data, I need to create a field for all of them, and combine all 5 of those fields into one. using ‘rbind’ will combine each of the fields into one</p>
 <pre class="r"><code>d21&lt;- read_csv(&quot;footballlogs21-2.csv&quot;)</code></pre>
-<pre><code>## Rows: 740 Columns: 54</code></pre>
-<pre><code>## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr   (8): HomeAway, Opponent, Result, TeamFull, TeamURL, Outcome, Team, Con...
-## dbl  (45): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, ...
-## date  (1): Date</code></pre>
-<pre><code>## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <pre class="r"><code>d20&lt;- read_csv(&quot;footballlogs20.csv&quot;)</code></pre>
-<pre><code>## Rows: 1100 Columns: 54</code></pre>
-<pre><code>## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr   (8): HomeAway, Opponent, Result, TeamFull, TeamURL, Outcome, Team, Con...
-## dbl  (45): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, ...
-## date  (1): Date</code></pre>
-<pre><code>## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <pre class="r"><code>d19&lt;- read_csv(&quot;footballlogs19.csv&quot;)</code></pre>
-<pre><code>## Rows: 1662 Columns: 54</code></pre>
-<pre><code>## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr   (8): HomeAway, Opponent, Result, TeamFull, TeamURL, Outcome, Team, Con...
-## dbl  (45): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, ...
-## date  (1): Date</code></pre>
-<pre><code>## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <pre class="r"><code>d18&lt;- read_csv(&quot;footballlogs18.csv&quot;)</code></pre>
-<pre><code>## Rows: 1656 Columns: 54</code></pre>
-<pre><code>## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr   (8): HomeAway, Opponent, Result, TeamFull, TeamURL, Outcome, Team, Con...
-## dbl  (45): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, ...
-## date  (1): Date</code></pre>
-<pre><code>## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <pre class="r"><code>d17&lt;- read_csv(&quot;footballlogs17.csv&quot;)</code></pre>
-<pre><code>## Rows: 1650 Columns: 54</code></pre>
-<pre><code>## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr   (8): HomeAway, Opponent, Result, TeamFull, TeamURL, Outcome, Team, Con...
-## dbl  (45): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, ...
-## date  (1): Date</code></pre>
-<pre><code>## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <pre class="r"><code>defensestats &lt;- rbind(d17, d18, d19, d20, d21)</code></pre>
 <p>Next, I need to filter out all teams in this data set so that I’m only looking at the Cornhuskers.</p>
 <pre class="r"><code>nu &lt;- defensestats %&gt;% 
